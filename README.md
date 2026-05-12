@@ -375,7 +375,6 @@
 <tr>
 <td rowspan="2"><p align="center"><img src="https://img.icons8.com/color/240/null/windows-11.png" style="width: 50px;"/> <img src="https://img.icons8.com/color/240/null/windows-10.png" style="width: 50px;"/></p></td>
 <td rowspan="2"><h4>Custom Builds:<h4><p><a href="https://github.com/MustardChef/WSAMagiskDelta"><img alt="windownmagikdelta" src="https://img.shields.io/badge/Windows%2010%2F11-Magisk%20Delta-382bef?style=for-the-badge"/></a></p></h4></h4></td>
-<td rowspan="2"></td>
 </tr>
 <tr>
 </tr>
