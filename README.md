@@ -1,6 +1,6 @@
 
 
-> ### This repo is being udpated to fix bugs by UDMODZ team
+> ### This repo is being updated to fix bugs by UDMODZ team
 > 
 
 
