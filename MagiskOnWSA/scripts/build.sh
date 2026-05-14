@@ -546,6 +546,25 @@ if [ "$ROOT_SOL" = "magisk" ]; then
         "$WORK_DIR/magisk/magiskboot" compress=xz "$WORK_DIR/magisk/init-ld" "$WORK_DIR/magisk/init-ld.xz"
         unset SKIPINITLD
     fi
+    echo "Patching initrd"
+    cp post-fs-data.sh "$WORK_DIR/post-fs-data.sh"
+    if [ "$CUSTOM_MODEL" ] && [ "$CUSTOM_MODEL" != "none" ]; then
+        echo "Integrating device spoofing for $MODEL_NAME ($CUSTOM_MODEL)"
+        {
+            echo ""
+            echo "# Device Spoofing"
+            echo "resetprop ro.product.model \"$MODEL_NAME\""
+            echo "resetprop ro.product.name \"$CUSTOM_MODEL\""
+            echo "resetprop ro.product.device \"$CUSTOM_MODEL\""
+            echo "resetprop ro.product.build.product \"$CUSTOM_MODEL\""
+            echo "resetprop ro.product.system.model \"$MODEL_NAME\""
+            echo "resetprop ro.product.system.name \"$CUSTOM_MODEL\""
+            echo "resetprop ro.product.system.device \"$CUSTOM_MODEL\""
+            echo "resetprop ro.product.product.model \"$MODEL_NAME\""
+            echo "resetprop ro.product.product.name \"$CUSTOM_MODEL\""
+            echo "resetprop ro.product.product.device \"$CUSTOM_MODEL\""
+        } >> "$WORK_DIR/post-fs-data.sh"
+    fi
     "$WORK_DIR/magisk/magiskboot" compress=xz "$MAGISK_PATH" "$WORK_DIR/magisk/stub.xz"
     "$WORK_DIR/magisk/magiskboot" cpio "$WORK_DIR/wsa/$ARCH/Tools/initrd.img" \
         "mv /init /wsainit" \
@@ -561,9 +580,10 @@ if [ "$ROOT_SOL" = "magisk" ]; then
         "add 0644 overlay.d/sbin/stub.xz $WORK_DIR/magisk/stub.xz" \
         "mkdir 000 .backup" \
         "add 000 overlay.d/init.lsp.magisk.rc init.lsp.magisk.rc" \
-        "add 000 overlay.d/sbin/post-fs-data.sh post-fs-data.sh" \
+        "add 000 overlay.d/sbin/post-fs-data.sh $WORK_DIR/post-fs-data.sh" \
         "add 000 overlay.d/sbin/lsp_cust.img $CUST_PATH" \
         || abort "Unable to patch initrd"
+
 elif [ "$ROOT_SOL" = "kernelsu" ]; then
     echo "Extracting KernelSU"
     # shellcheck disable=SC1090
