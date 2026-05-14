@@ -3,22 +3,6 @@
 > ### This repo is being updated to fix bugs by UDMODZ team
 > 
 
-
-> [!CAUTION]
->
-> # It seems that the last few Windows Updates released on many/all of the update channels (issue started from July) are breaking WSA installations for many users! 
->
-> - ## If you are affected by the issue, try these current workarounds:
->   - ### RECOMMENDED FIX FOR BUILDS CONTAINING GAPPS (Google Play Store and Services): https://github.com/MustardChef/WSABuilds/issues/593#issuecomment-3172749449
->       OR
->   - #### Switch/Use the builds which do not contain GApps. These are the builds that contain ``NoGApps`` in their .7z archive names. 
->   - #### Really old builds of WSA (2211/2210) are known to be working.  
-> - ## Refer to https://github.com/MustardChef/WSABuilds/issues/593 for more information regarding the issue.
->
-
-> [!TIP]
-> ## To view the bugfixes and improvements that are currently being worked on, and the current state of the WSABuilds project, [refer to the corresponding project page](https://github.com/users/MustardChef/projects/5) 
-
       
 <br/>
 <p align="center">
