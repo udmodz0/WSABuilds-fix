@@ -2,7 +2,7 @@
 
 - ### Check if your issue is listed in the list of "Common Issues" below:
      
-<picture><a href=""><img style="float: left;" src="https://img.icons8.com/external-soft-fill-juicy-fish/96/null/external-bug-coding-and-development-soft-fill-soft-fill-juicy-fish-2.png" width="60" height="60"/></picture><h2> &nbsp; Common Issues (Click Here)</h2></a></picture>
+<picture><a href="https://github.com/MustardChef/WSABuilds/blob/master/Documentation/WSABuilds/Having%20Issues.md"><img style="float: left;" src="https://img.icons8.com/external-soft-fill-juicy-fish/96/null/external-bug-coding-and-development-soft-fill-soft-fill-juicy-fish-2.png" width="60" height="60"/></picture><h2> &nbsp; Common Issues (Click Here)</h2></a></picture>
 
 ---
 

@@ -27,15 +27,15 @@
 
 **How can I update Windows Subsystem For Android™ to a new version?**
 
-- As Explained [Installation instructions](#installation). Download the [latest Windows Subsystem For Android™ Version](#downloads) and replace the content of your previous installation and rerun Install.ps1. Don't worry, your data will be preserved
+- As Explained [Installation instructions](Installation.md). Download the [latest Windows Subsystem For Android™ Version](../../README.md#downloads) and replace the content of your previous installation and rerun Install.ps1. Don't worry, your data will be preserved
 
 **How do I update Magisk?**
 
-- Do the same as updating Windows Subsystem For Android™.  Wait for a new MagiskOnWSA release that includes the newer Magisk version, then follow the [Installation instructions](#installation) to update
+- Do the same as updating Windows Subsystem For Android™.  Wait for a new MagiskOnWSA release that includes the newer Magisk version, then follow the [Installation instructions](Installation.md) to update
 
 **Can I pass SafetyNet/Play Integrity?**
 
-- No. Virtual machines like Windows Subsystem For Android™ cannot pass these mechanisms on their own due to the lack of signing by Google. Passing requires more exotic (and untested) solutions like: <https: 145#discussioncomment-2170917="" discussions="" github.com="" kdrag0n="" safetynet-fix="">
+- No. Virtual machines like Windows Subsystem For Android™ cannot pass these mechanisms on their own due to the lack of signing by Google. Passing requires more exotic (and untested) solutions like: <https://github.com/kdrag0n/safetynet-fix/discussions/145#discussioncomment-2170917>
 
 **What is virtualization?**
 
@@ -68,11 +68,11 @@
 
 **How do I uninstall Magisk?**
 
-- Request, using [Issues](https://github.com/MustardChef/WSABuilds/issues), a Windows Subsystem For Android™ version that doesn't include Magisk from the [Releases page](https://github.com/MustardChef/WSABuilds/releases/latest). Then follow the [Installation instructions](#installation)
+- Request, using [Issues](https://github.com/MustardChef/WSABuilds/issues), a Windows Subsystem For Android™ version that doesn't include Magisk from the [Releases page](https://github.com/MustardChef/WSABuilds/releases/latest). Then follow the [Installation instructions](Installation.md)
 
 **Can I switch between OpenGApps and MindTheGapps?**
 
-- No. GApps will no longer function. Do a [complete uninstallation](#uninstallation) before switching
+- No. GApps will no longer function. Do a [complete uninstallation](Uninstallation.md) before switching
 
 **How do I install custom Magisk or GApps?**
 
