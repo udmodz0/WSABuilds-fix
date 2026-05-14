@@ -155,7 +155,7 @@ for filename, values in identities.items():
     if re.match(f"Microsoft\.UI\.Xaml\..*_{arch}_.*\.appx", filename):
         out_file_name = f"{values[1]}_{arch}.appx"
         out_file = download_dir / out_file_name
-    elif re.match(f"Microsoft\.VCLibs\..+\.UWPDesktop_.*_{arch}_.*\.appx", filename):
+    elif re.match(rf"Microsoft\.VCLibs\..+\.UWPDesktop_.*_{arch}_.*\.appx", filename):
         out_file_name = f"{values[1]}_{arch}.appx"
         out_file = download_dir / out_file_name
     elif re.match(f"Microsoft\.VCLibs\..+_.*_{arch}_.*\.appx", filename):

@@ -39,7 +39,11 @@ function Get-InstalledDependencyVersion {
 }
 
 Function Check-Windows11 {
-    RETURN (Get-ComputerInfo | Select-Object -expand OsName) -match 11
+    try {
+        return (Get-ComputerInfo -Property OsName).OsName -match "Windows 11"
+    } catch {
+        return $false
+    }
 }
 
 Function Test-CommandExist {
@@ -53,8 +57,8 @@ Function Test-CommandExist {
 
 Function Finish {
     Clear-Host
-    Start-Process "wsa://com.topjohnwu.magisk"
-    Start-Process "wsa://com.android.vending"
+    Start-Process "wsa://com.topjohnwu.magisk" -ErrorAction SilentlyContinue
+    Start-Process "wsa://com.android.vending" -ErrorAction SilentlyContinue
 }
 
 If ((Check-Windows11) -And (Test-CommandExist 'pwsh.exe')) {
@@ -68,37 +72,56 @@ If (-Not (Test-Administrator)) {
     $Proc = Start-Process -PassThru -Verb RunAs $pwsh -Args "-ExecutionPolicy Bypass -Command Set-Location '$PSScriptRoot'; &'$PSCommandPath' EVAL"
     If ($null -Ne $Proc) {
         $Proc.WaitForExit()
+        exit $Proc.ExitCode
     }
     If ($null -Eq $Proc -Or $Proc.ExitCode -Ne 0) {
         Write-Warning "Failed to launch start as Administrator`r`nPress any key to exit"
         $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
     }
-    exit
+    exit 1
 }
 ElseIf (($args.Count -Eq 1) -And ($args[0] -Eq "EVAL")) {
-    Start-Process $pwsh -NoNewWindow -Args "-ExecutionPolicy Bypass -Command Set-Location '$PSScriptRoot'; &'$PSCommandPath'"
-    exit
+    $Proc = Start-Process -PassThru $pwsh -NoNewWindow -Args "-ExecutionPolicy Bypass -Command Set-Location '$PSScriptRoot'; &'$PSCommandPath'"
+    $Proc.WaitForExit()
+    exit $Proc.ExitCode
 }
 
 $FileList = Get-Content -Path .\filelist.txt
-If (((Test-Path -Path $FileList) -Eq $false).Count) {
-    Write-Error "Some files are missing in the folder. Please try to build again. Press any key to exit"
+$MissingFiles = $FileList | Where-Object { -Not (Test-Path -Path $_) }
+If ($MissingFiles) {
+    Write-Error "Some files are missing in the folder: $($MissingFiles -join ', '). Please try to build again. Press any key to exit"
     $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
     exit 1
 }
 
-If (((Test-Path -Path "MakePri.ps1") -And (Test-Path -Path "makepri.exe")) -Eq $true) {
+# Robust discovery of makepri.exe
+$MakePriExe = "makepri.exe"
+if (-Not (Test-Path -Path $MakePriExe)) {
+    $PossiblePaths = @(
+        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\makepri.exe",
+        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\arm64\makepri.exe",
+        "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\makepri.exe"
+    )
+    foreach ($Path in $PossiblePaths) {
+        if (Test-Path -Path $Path) {
+            $MakePriExe = $Path
+            break
+        }
+    }
+}
+
+If ((Test-Path -Path "MakePri.ps1") -And ((Test-Path -Path $MakePriExe) -Or (Test-CommandExist $MakePriExe))) {
+    Write-Output "Running MakePri.ps1 to merge resources..."
     $ProcMakePri = Start-Process $pwsh -PassThru -NoNewWindow -Args "-ExecutionPolicy Bypass -File MakePri.ps1" -WorkingDirectory $PSScriptRoot
-    $null = $ProcMakePri.Handle
     $ProcMakePri.WaitForExit()
     If ($ProcMakePri.ExitCode -Ne 0) {
-        Write-Warning "Failed to merge resources, WSA Seetings will always be in English`r`nPress any key to continue"
+        Write-Warning "Failed to merge resources, WSA Settings will always be in English`r`nPress any key to continue"
         $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
     }
     $Host.UI.RawUI.WindowTitle = "Installing MagiskOnWSA...."
 }
 
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1"
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v "AllowDevelopmentWithoutDevLicense" /d "1" | Out-Null
 
 # When using PowerShell which is installed with MSIX
 # Get-WindowsOptionalFeature and Enable-WindowsOptionalFeature will fail
@@ -127,21 +150,18 @@ $Dependencies = $Xml.Package.Dependencies.PackageDependency;
 $Dependencies | ForEach-Object {
     $InstalledVersion = Get-InstalledDependencyVersion -Name $_.Name -ProcessorArchitecture $ProcessorArchitecture;
     If ( $InstalledVersion -Lt $_.MinVersion ) {
-        If ($env:WT_SESSION) {
-            $env:WT_SESSION = $null
-            Write-Output "Dependency should be installed but Windows Terminal is in use. Restarting to conhost.exe"
-            Start-Process conhost.exe -Args "powershell.exe -ExecutionPolicy Bypass -Command Set-Location '$PSScriptRoot'; &'$PSCommandPath'"
-            exit 1
+        if (Test-Path -Path "$($_.Name)_$ProcessorArchitecture.appx") {
+            Write-Output "Dependency package $($_.Name) $ProcessorArchitecture required minimum version: $($_.MinVersion). Installing...."
+            Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Path "$($_.Name)_$ProcessorArchitecture.appx"
+        } else {
+            Write-Warning "Dependency package $($_.Name) $ProcessorArchitecture required but installer not found."
         }
-        Write-Output "Dependency package $($_.Name) $ProcessorArchitecture required minimum version: $($_.MinVersion). Installing...."
-        Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion -Path "$($_.Name)_$ProcessorArchitecture.appx"
     }
     Else {
         Write-Output "Dependency package $($_.Name) $ProcessorArchitecture current version: $InstalledVersion. Nothing to do."
     }
 }
 
-$Installed = $null
 $Installed = Get-AppxPackage -Name $Name
 
 If (($null -Ne $Installed) -And (-Not ($Installed.IsDevelopmentMode))) {
@@ -158,7 +178,7 @@ If (($null -Ne $Installed) -And (-Not ($Installed.IsDevelopmentMode))) {
 
 If (Test-CommandExist WsaClient) {
     Write-Output "Shutting down WSA...."
-    Start-Process WsaClient -Wait -Args "/shutdown"
+    Start-Process WsaClient -Wait -Args "/shutdown" -ErrorAction SilentlyContinue
 }
 Stop-Process -Name "WsaClient" -ErrorAction SilentlyContinue
 Write-Output "Installing MagiskOnWSA...."

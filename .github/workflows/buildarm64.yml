@@ -77,14 +77,9 @@ jobs:
         id: wsa
         working-directory: MagiskOnWSA
         run: |
-          if [[ "${{ inputs.release_type }}" == "WIF" ]]; then
-              RLS_TYPE="latest"
-          else
-              RLS_TYPE="retail"
-          fi
           chmod -R 777 ./
           mkdir -p download
-          ./scripts/build.sh --arch ${{ inputs.arch }} --release-type WIF --magisk-ver ${{ inputs.magiskver }} ${{ inputs.gapps }} --root-sol ${{ inputs.root }} ${{ inputs.amazonflag }} --compress-format zip
+          ./scripts/build.sh --arch ${{ inputs.arch }} --release-type WIF --magisk-ver ${{ inputs.magiskver }} ${{ inputs.gapps }} --root-sol ${{ inputs.root }} ${{ inputs.amazonflag }} --compress-format zip --custom-model ${{ inputs.devicemodel }}
 
       - name: Check Subdirectories and Directories
         working-directory: MagiskOnWSA

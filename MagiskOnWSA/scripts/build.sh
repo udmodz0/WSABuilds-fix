@@ -200,6 +200,8 @@ ARGUMENT_LIST=(
     "skip-download-wsa"
     "help"
     "debug"
+    "custom-model:"
+    "gapps-brand:"
 )
 
 default
@@ -255,6 +257,14 @@ while [[ $# -gt 0 ]]; do
             SKIP_DOWN_WSA=1
             shift
             ;;
+        --custom-model)
+            CUSTOM_MODEL="$2"
+            shift 2
+            ;;
+        --gapps-brand)
+            GAPPS_BRAND="$2"
+            shift 2
+            ;;
         --help)
             usage
             exit 0
@@ -269,6 +279,33 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ "$CUSTOM_MODEL" ] && [ "$CUSTOM_MODEL" != "none" ]; then
+    declare -A MODEL_NAME_MAP=(
+        ["sunfish"]="Pixel 4a"
+        ["bramble"]="Pixel 4a (5G)"
+        ["redfin"]="Pixel 5"
+        ["barbet"]="Pixel 5a"
+        ["raven"]="Pixel 6 Pro"
+        ["oriole"]="Pixel 6"
+        ["bluejay"]="Pixel 6a"
+        ["panther"]="Pixel 7"
+        ["cheetah"]="Pixel 7 Pro"
+        ["lynx"]="Pixel 7a"
+        ["tangorpro"]="Pixel Tablet"
+        ["felix"]="Pixel Fold"
+        ["shiba"]="Pixel 8"
+        ["husky"]="Pixel 8 Pro"
+        ["tokay"]="Pixel 9"
+        ["caiman"]="Pixel 9 Pro"
+        ["komodo"]="Pixel 9 Pro XL"
+    )
+    MODEL_NAME="${MODEL_NAME_MAP[$CUSTOM_MODEL]}"
+    if [ -z "$MODEL_NAME" ]; then
+        echo "WARN: Unknown custom model $CUSTOM_MODEL, using default"
+        CUSTOM_MODEL="none"
+    fi
+fi
 
 check_list() {
     local input=$1
